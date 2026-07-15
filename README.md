@@ -123,15 +123,6 @@ See CONTRIBUTING.md for guidelines on:
 - Testing changes
 - Code style standards
 
-Publication information
-
-See docs/PUBLICATION.md for:
-- Research context and motivation
-- Technical specifications
-- Performance metrics
-- Validation and testing
-- F1000 submission details
-
 License
 
 MIT License. See LICENSE file.
