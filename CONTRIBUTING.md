@@ -1,56 +1,54 @@
 # Contributing
 
-Interested in contributing? Here's how.
+Thanks for contributing to GROMACS Insight Platform.
 
-## Issues
+## Reporting Issues
 
-Found a bug or have a feature request?
+Before opening a new issue, please check existing reports:
 
-1. Check [existing issues](https://github.com/AyushmaanSingh941/gromacs-trajectory-displayer/issues)
-2. Open a new issue with:
-   - Clear description
-   - Steps to reproduce (if bug)
-   - Expected vs. actual behavior
-   - System info (OS, Python version, file details)
+- https://github.com/AyushmaanSingh941/gromacs-trajectory-displayer/issues
 
-## Code
+When filing a bug, include:
 
-### Setup
+- What you expected
+- What happened
+- Minimal reproducible input (`.xvg` snippet if possible)
+- Python version and OS
+
+## Development Setup
 
 ```bash
 git clone https://github.com/AyushmaanSingh941/gromacs-trajectory-displayer.git
 cd gromacs-trajectory-displayer
-python -m venv venv
-source venv/bin/activate  # or venv\Scripts\activate on Windows
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### Make changes
+## Project Structure
 
-1. Create feature branch: `git checkout -b feature/your-feature`
-2. Make changes
-3. Test thoroughly
-4. Commit with clear message: `git commit -m "Add feature description"`
-5. Push: `git push origin feature/your-feature`
-6. Open Pull Request
+- `app.py`: Streamlit UI
+- `src/`: parsing, analysis, statistics, plotting, and reporting modules
+- `tests/`: automated tests
 
-### Code style
+## Pull Request Checklist
 
-- Follow PEP 8
-- Max line length: 100 characters
-- Use descriptive variable names
-- Comment non-obvious logic
-- Keep functions focused
+1. Keep changes focused and well-scoped.
+2. Add or update tests for behavior changes.
+3. Run tests locally:
+   ```bash
+   pytest -q
+   ```
+4. Update documentation when behavior or interfaces change.
+5. Use clear commit messages and PR descriptions.
 
-### Testing
+## Coding Guidelines
 
-Before submitting:
-
-- Test with different file sizes (100 frames, 10k frames, 100k+ frames)
-- Test different data types (single column, multi-column, non-standard headers)
-- Test all chart types and features
-- Test error cases (invalid format, corrupted data, empty files)
+- Follow PEP 8.
+- Prefer clear naming over compact clever code.
+- Keep scientific statements accurate and bounded to computed data.
+- Avoid introducing unsupported claims in UI or docs.
 
 ## License
 
-By contributing, you agree your code is licensed under the MIT License.
+By contributing, you agree that your contributions are licensed under the MIT License.
