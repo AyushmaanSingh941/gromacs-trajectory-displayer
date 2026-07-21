@@ -1,100 +1,94 @@
-GROMACS Insight Platform
-A Streamlit app for poking at GROMACS `.xvg` output without writing a new
-MDAnalysis script every time. Upload RMSD/RMSF/Rg/SASA/H-bond/energy/
-temperature/pressure files, get them auto-classified, run an equilibration
-quality check, compare runs against each other, and export a report.
-Install
+# GROMACS Insight Platform
+
+GROMACS Insight Platform is a Streamlit application for inspecting common GROMACS `.xvg` outputs (for example RMSD, RMSF, radius of gyration, SASA, hydrogen bonds, energy, temperature, and pressure) without writing custom notebooks.
+
+It parses uploaded files, auto-detects metric type using filename/header heuristics, provides interactive plots, computes descriptive statistics, runs heuristic equilibration/stability checks, and exports Markdown/PDF reports.
+
+## Key Features
+
+- Parse `.xvg` files with Grace-style headers and numeric tables
+- Heuristic file-type detection from filename and axis/title text
+- Interactive Plotly visualizations (line, scatter, area)
+- Optional moving-average overlay and Y-axis log scale
+- RMSF residue ranking for high-flexibility residues
+- Heuristic equilibration estimate for time-series metrics
+- Per-metric stability scoring and aggregate quality scoring
+- Pairwise Welch t-test comparisons for same metric types
+- Export parsed CSV, chart images (PNG/SVG/PDF), Markdown report, and PDF report
+
+## Repository Layout
+
+```text
+app.py                  Streamlit UI and orchestration
+src/
+  __init__.py
+  parser.py             XVG parsing and file-type detection
+  statistics.py         Descriptive and comparative statistics
+  analysis.py           Equilibration/stability heuristics and explainers
+  visualization.py      Plotly figure builders and export helpers
+  report.py             Markdown/PDF report generation
+tests/
+  test_parser.py
+  test_statistics.py
+  test_analysis.py
+requirements.txt        Runtime and test dependencies
+CONTRIBUTING.md         Contribution workflow
+```
+
+## Requirements
+
+- Python 3.10+
+- pip
+
+## Installation
+
 ```bash
 pip install -r requirements.txt
+```
 
-# figure export (PNG/SVG/PDF) needs a local Chrome install for kaleido —
-# run this once, or those specific export buttons will just show a
-# friendly error and everything else still works fine
+### Optional static image export dependency
+
+Plotly static export via Kaleido requires a local Chrome/Chromium installation.
+
+```bash
 plotly_get_chrome
 ```
-Run
+
+If Chrome is unavailable, the app still works; only static image export buttons fail gracefully.
+
+## Run the App
+
 ```bash
 streamlit run app.py
 ```
-Run the tests
+
+## Run Tests
+
 ```bash
-pytest tests/ -v
+pytest -q
 ```
-Layout
-```
-app.py                 Streamlit UI — wiring only, no analysis logic lives here
-src/
-  parser.py             .xvg parsing + file-type auto-detection (filename + header text)
-  statistics.py          mean/median/std/CI/moving average/correlation/two-sample comparison
-  analysis.py             equilibration heuristic, per-filetype stability scoring, quality score,
-                           rule-based (non-LLM) metric explainer, RMSF residue ranking
-  visualization.py        Plotly figure builders (dark theme) + PNG/SVG/PDF export
-  report.py               markdown report builder + a simple reportlab PDF export
-tests/                  pytest coverage for parser/statistics/analysis
-```
-What "auto-detection" actually does
-File type is guessed from the filename first (`rmsd.xvg`, `gyrate.xvg`, etc. —
-gmx's default output names are pretty consistent), and falls back to
-scanning the xmgrace title/axis text if the filename doesn't give it away.
-It's a heuristic, not a parser of GROMACS internals — if you've renamed
-your files to something unrecognizable with no useful title, it'll come
-back "Unrecognized" and you still get raw stats, just no equilibration/
-quality scoring on top.
-About the equilibration and quality-score numbers
-Both are explicitly heuristics, documented as such in the docstrings in
-`analysis.py`:
-Equilibration estimate: block-averaging against the mean/std of the
-final quarter of the run. It's a reasonable first pass, not a
-statistical-inefficiency method. If you need a citable equilibration
-point, look at `pymbar.timeseries.detect_equilibration`.
-Quality score: a 0–100 composite built from whatever stability
-metrics are available for a given file (RMSD/Rg/SASA/H-bonds use a
-coefficient-of-variation-based plateau score; temperature uses std
-relative to its setpoint; pressure and energy use drift over the back
-half of the run instead of raw noise, since pressure especially is
-expected to be noisy in a healthy NPT simulation). It's a triage aid for
-scanning a folder of output quickly — not a validated benchmark, and it
-doesn't prove anything about protein stability or biology. Always look
-at the actual plot before trusting the number.
-Comparison p-values: computed with Welch's t-test, with a caveat
-attached every time they're shown — MD frames are autocorrelated in
-time, so treating every frame as an independent sample overstates
-significance. Treat it as a rough signal.
-Example workflow
-Run a WT and a mutant simulation in GROMACS, get `rmsd.xvg`,
-`rmsf.xvg`, `gyrate.xvg`, and `energy.xvg` out of `gmx rms` / `gmx rmsf`
-/ `gmx gyrate` / `gmx energy` for each.
-Upload all of them at once — the sidebar badges will show what got
-detected as what.
-Use Quick View to eyeball a couple of runs overlaid before doing
-anything else.
-Hit Analyze. Each timeseries file gets an equilibration estimate
-and quality score; RMSF files get a per-residue flexibility plot with
-the top N flagged automatically.
-If two files share a detected type (e.g. two `rmsd.xvg` from WT vs
-mutant), a comparison section shows up automatically with the mean
-difference and a caveated significance test.
-Download the markdown or PDF report to keep with the rest of your run's
-notes.
-Known limitations / what's simplified
-The PDF report is a plain, functional layout (reportlab) — not
-journal-typeset. The markdown report is the more flexible format if
-you want to fold it into something else.
-No literal LLM is wired in. The "explain this metric" box is a
-template-based responder that only ever restates numbers already
-computed elsewhere in the app — deliberately, so it can't hallucinate
-an explanation. Swapping in a real model call is a reasonable follow-up
-if you want free-text Q&A, just keep it grounded to computed values.
-Statistical comparisons don't correct for autocorrelation — see the
-caveat above.
-RMSF handling assumes the standard `gmx rmsf` per-residue output
-(residue index in column 1). Per-atom RMSF or custom residue
-numbering will still parse, but the x-axis label just says "Residue."
-If you want to take this further
-Swap the rule-based explainer for a real LLM call, keeping the prompt
-scoped strictly to the computed stats so it can't invent numbers.
-Add `pymbar` for a statistically rigorous equilibration/decorrelation
-step before the comparison t-tests.
-Batch mode / CLI wrapper around `src/` for analyzing a whole directory
-of runs without going through the UI, if this turns into something
-worth publishing as a standalone tool.
+
+## Supported Input Expectations
+
+- Text files in GROMACS/Grace-like format
+- Header lines starting with `#` or `@`
+- Whitespace-separated numeric columns
+- First column interpreted as time for time-series metrics
+- RMSF detected as non-time-series and treated as residue-indexed data
+
+## Scientific Scope and Limitations
+
+This project is intended for exploratory analysis and fast triage, not as a standalone publication-grade statistical workflow.
+
+- Equilibration detection is heuristic (block-based), not a replacement for statistical inefficiency methods (for example `pymbar.timeseries.detect_equilibration`).
+- Quality score is a heuristic composite and should not be interpreted as proof of physical validity.
+- Welch t-test outputs do **not** correct for MD time autocorrelation; p-values are approximate signals only.
+- Interpret biological meaning from domain expertise and raw trajectory context, not from a single score.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).

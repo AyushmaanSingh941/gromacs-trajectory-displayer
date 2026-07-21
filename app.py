@@ -373,7 +373,6 @@ if st.button("▶  Analyze", type="primary"):
 if st.session_state["analysis_ran"]:
 
     files_summary = []
-    per_file_scores = {}
 
     for fname, pf in timeseries_files.items():
         y_col = pf.y_cols[0]
@@ -382,10 +381,9 @@ if st.session_state["analysis_ran"]:
 
         desc = stats_mod.descriptive_stats(values)
         eq = analysis.estimate_equilibration(time_arr, values)
-        label, score, details = analysis.compute_stability_component(pf.filetype, time_arr, values)
+        label, score, _ = analysis.compute_stability_component(pf.filetype, time_arr, values)
         q = analysis.quality_score({label: score}) if score is not None else None
 
-        per_file_scores[fname] = score
         files_summary.append({
             "filename": fname, "filetype": pf.filetype, "n_frames": len(pf.df),
             "stats": desc, "equilibration": eq, "quality": q,

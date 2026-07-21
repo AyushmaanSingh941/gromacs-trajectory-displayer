@@ -128,9 +128,6 @@ def build_pdf_report(markdown_text: str, figures: list[tuple[str, bytes]] | None
         else:
             # strip the light markdown we use (bold/italic/bullets) since
             # reportlab's Paragraph only understands a subset of html-ish tags
-            clean = line.replace("**", "<b>", 1)
-            if "<b>" in clean and clean.count("**") == 0:
-                pass
             clean = (line.replace("**", "")
                          .replace("_", "")
                          .replace("> ", "")
