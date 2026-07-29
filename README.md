@@ -47,8 +47,10 @@ CONTRIBUTING.md         Contribution workflow
 
 ## Installation
 
+The easiest way to use the platform is to install it directly from PyPI:
+
 ```bash
-pip install -r requirements.txt
+pip install gromacs-trajectory-displayer
 ```
 
 ### Optional static image export dependency
