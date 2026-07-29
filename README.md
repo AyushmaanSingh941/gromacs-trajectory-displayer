@@ -2,6 +2,9 @@
 
 [![Documentation Status](https://readthedocs.org/projects/gromacs-trajectory-displayer/badge/?version=latest)](https://gromacs-trajectory-displayer.readthedocs.io/en/latest/?badge=latest)
 
+[![CI and Coverage](https://github.com/AyushmaanSingh941/gromacs-trajectory-displayer/actions/workflows/ci.yml/badge.svg)](https://github.com/AyushmaanSingh941/gromacs-trajectory-displayer/actions)
+[![codecov](https://codecov.io/gh/AyushmaanSingh941/gromacs-trajectory-displayer/branch/main/graph/badge.svg)](https://codecov.io/gh/AyushmaanSingh941/gromacs-trajectory-displayer)
+
 GROMACS Insight Platform is a Streamlit application for inspecting common GROMACS `.xvg` outputs (for example RMSD, RMSF, radius of gyration, SASA, hydrogen bonds, energy, temperature, and pressure) without writing custom notebooks.
 
 It parses uploaded files, auto-detects metric type using filename/header heuristics, provides interactive plots, computes descriptive statistics, runs heuristic equilibration/stability checks, and exports Markdown/PDF reports.
