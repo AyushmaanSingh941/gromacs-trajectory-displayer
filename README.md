@@ -9,6 +9,15 @@ GROMACS Insight Platform is a Streamlit application for inspecting common GROMAC
 
 It parses uploaded files, auto-detects metric type using filename/header heuristics, provides interactive plots, computes descriptive statistics, runs heuristic equilibration/stability checks, and exports Markdown/PDF reports.
 
+## Supported File Types
+
+This app accepts:
+
+- **`.xvg`** — GROMACS/Grace-style analysis output (RMSD, RMSF, Rg, SASA, hydrogen bonds, energy, temperature, pressure, etc.)
+- **`.log`** — GROMACS log files for supported metrics
+
+It does **not** read raw trajectory files. Formats such as **`.xtc`** and **`.trr`** are not supported and cannot be uploaded directly — only the text-based, human-readable analysis output listed above is accepted. If you need to analyze a raw trajectory, first generate the relevant `.xvg`/`.log` output using the appropriate GROMACS analysis tool (e.g. `gmx rms`, `gmx rmsf`, `gmx gyrate`, `gmx sasa`), then upload that output here.
+
 ## Key Features
 
 - Parse `.xvg` files with Grace-style headers and numeric tables
@@ -20,6 +29,16 @@ It parses uploaded files, auto-detects metric type using filename/header heurist
 - Per-metric stability scoring and aggregate quality scoring
 - Pairwise Welch t-test comparisons for same metric types
 - Export parsed CSV, chart images (PNG/SVG/PDF), Markdown report, and PDF report
+
+## Screenshots
+
+![App overview](screenshot1.png)
+
+![Analysis view](screenshot2.png)
+
+## Real-World Use Case
+
+A researcher has just finished a 100 ns molecular dynamics simulation of an engineered PETase enzyme that includes a designed rigid linker intended to stabilize two functional domains. To validate the design, they upload the run's `.xvg` outputs — RMSD, RMSF, and radius of gyration — into the platform. Using the interactive plots, they check whether the linker region shows low residue-level fluctuation in the RMSF plot and whether the overall RMSD and Rg trends flatten out after an initial equilibration period, rather than drifting upward over the full trajectory. This quick visual and statistical triage helps the researcher decide, in minutes rather than hours, whether the rigid-linker design appears to be behaving as intended before moving on to more rigorous, publication-grade analysis.
 
 ## Repository Layout
 

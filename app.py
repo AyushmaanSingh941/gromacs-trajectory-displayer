@@ -21,7 +21,7 @@ import pandas as pd
 pd.set_option("styler.render.max_elements", 2000000)
 
 from src import analysis, report, statistics as stats_mod, visualization as viz
-from src.parser import FRIENDLY_NAMES, parse_xvg
+from src.parser import FRIENDLY_NAMES, parse_xvg, parse_log
 
 
 st.set_page_config(
@@ -133,7 +133,10 @@ def _cached_parse(filename: str, file_bytes: bytes):
     # streamlit can't cache a dataclass with a DataFrame inside directly in
     # older versions without some coaxing, but it handles it fine as long
     # as the inputs (filename + bytes) are hashable, which they are
-    return parse_xvg(filename, file_bytes)
+    if filename.lower().endswith(".log"):
+        return parse_log(filename, file_bytes)
+    else:
+        return parse_xvg(filename, file_bytes)
 
 
 def parse_uploaded_files(files):
@@ -173,11 +176,12 @@ with st.sidebar:
     st.markdown('<div class="section-header">Input Files</div>', unsafe_allow_html=True)
 
     uploaded_files = st.file_uploader(
-        label="Upload GROMACS .xvg files",
-        type=["xvg", "txt"],
+        label="Upload GROMACS .xvg or .log files",
+        type=["xvg", "txt", "log"],
         accept_multiple_files=True,
-        help="Drop in rmsd.xvg, rmsf.xvg, gyrate.xvg, energy.xvg, whatever you've "
-             "got. Upload more than one to compare replicas, mutants, or conditions."
+        help="Drop in rmsd.xvg, rmsf.xvg, gyrate.xvg, energy.xvg, or an md.log "
+             "run log — whatever you've got. Upload more than one to compare "
+             "replicas, mutants, or conditions."
     )
 
     st.markdown('<div class="section-header">Chart Options</div>', unsafe_allow_html=True)
@@ -235,7 +239,7 @@ if not uploaded_files:
             </p>
             <p style="color:#8B949E; font-size:0.85rem; line-height:1.6;">
                 Use the <strong style="color:#C9D1D9;">sidebar</strong> to upload one or more
-                GROMACS <code>.xvg</code> files.<br>
+                GROMACS <code>.xvg</code> or <code>.log</code> files.<br>
                 Upload several to compare replicas or WT vs mutant runs side by side.
             </p>
         </div>
